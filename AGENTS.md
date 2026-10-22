@@ -34,7 +34,7 @@ dns-resolver.js        Respaldo: resuelve los canales desde el navegador (DoH).
 api/channels.js        Función serverless: GET /api/channels
 lib/dns-channels.js    Núcleo: resolución DNS TXT + recursión de categorías + caché.
 scripts/dev-server.js  Servidor local que replica el entorno de Vercel.
-public/icon.png        Icono de la app (sirve como favicon).
+icon.png               Icono de la app (sirve como favicon).
 package.json           Dependencias y scripts (npm run dev).
 README.md              Documentación breve de usuario.
 ads.txt                Publicador de AdSense: pub-7345993626465257
@@ -233,10 +233,12 @@ que puede funcionar.
 <link rel="icon" type="image/png" href="icon.png">
 ```
 
-El archivo está en `public/icon.png`, pero **Vercel sirve el contenido de
-`public/` en la raíz del dominio**: en producción vale `/icon.png`, y
-`/public/icon.png` da 404. Por eso la referencia es `icon.png` (relativa) y no
-`public/icon.png`.
+El icono está en `icon.png`, en la **raíz del proyecto**, y se sirve en `/icon.png`.
+
+> **No crees una carpeta `public/`.** Vercel la toma como raíz del contenido
+> estático: al añadirla, `index.html`, `app.js`, `dns-resolver.js` y `ads.txt`
+> dejan de servirse y **la web entera devuelve 404** (solo se sirve lo que hay
+> dentro de `public/`). Todo el frontend vive en la raíz.
 
 ---
 
