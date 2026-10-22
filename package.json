@@ -1,0 +1,30 @@
+{
+  "name": "acestreamlinks",
+  "version": "1.0.0",
+  "description": "Listado dinamico de canales AceStream resuelto desde los registros DNS TXT de AceStream",
+  "main": "api/channels.js",
+  "scripts": {
+    "dev": "node scripts/dev-server.js",
+    "start": "node scripts/dev-server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BURNI80/AcStreamLinks.git"
+  },
+  "keywords": [
+    "acestream",
+    "dutos",
+    "dns",
+    "vercel"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/BURNI80/AcStreamLinks/issues"
+  },
+  "homepage": "https://github.com/BURNI80/AcStreamLinks#readme",
+  "dependencies": {
+    "dns-packet": "^5.6.1"
+  }
+}

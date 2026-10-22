@@ -4,9 +4,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Sitio con Anuncios</title>
+    <title>ACE STREAM LINKS</title>
+    <meta name="description" content="Directos de AceStream actualizados dinamicamente: F1, La Liga, DAZN, Movistar, ESPN, Eurosport y mas.">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
     <style>
+        :root {
+            --bg: #121212;
+            --surface: #1e1e1e;
+            --surface-2: #292929;
+            --surface-3: #333;
+            --accent: #6200ea;
+            --accent-hover: #3700b3;
+            --accent-soft: #af76ff;
+            --text: #ffffff;
+            --text-dim: #b3b3b3;
+            --border: #333;
+            --green: #22c55e;
+            --red: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -14,15 +34,17 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-color: #121212;
-            color: #ffffff;
+            background-color: var(--bg);
+            color: var(--text);
             text-align: center;
+            min-height: 100vh;
         }
 
         .container {
             display: flex;
             max-width: 1400px;
             width: 100%;
+            align-items: flex-start;
         }
 
         .sidebar {
@@ -30,6 +52,8 @@
             max-width: 300px;
             padding: 20px;
             box-sizing: border-box;
+            position: sticky;
+            top: 20px;
         }
 
         .content {
@@ -39,9 +63,464 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-width: 0;
         }
 
-        /* Ajuste responsivo */
+        header {
+            width: 100%;
+            max-width: 1400px;
+            padding: 28px 20px 8px;
+            box-sizing: border-box;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 30px;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #6200ea, #af76ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header .subtitle {
+            margin: 8px 0 0;
+            color: var(--text-dim);
+            font-size: 14px;
+        }
+
+        /* ---------------- Toolbar ---------------- */
+
+        .toolbar {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .toolbar-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 220px;
+        }
+
+        .search-box input {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 14px 12px 40px;
+            color: var(--text);
+            font-size: 15px;
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        .search-box input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px #6200ea33;
+        }
+
+        .search-box input::placeholder {
+            color: #777;
+        }
+
+        .search-box svg {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+            pointer-events: none;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 11px 16px;
+            cursor: pointer;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background .15s, opacity .15s;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn:disabled {
+            opacity: .55;
+            cursor: progress;
+        }
+
+        .btn-ghost {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+        }
+
+        .btn-ghost:hover {
+            background: var(--surface-2);
+            color: var(--text);
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+
+        .status-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--text-dim);
+            display: inline-block;
+        }
+
+        .status-dot.ok {
+            background: var(--green);
+            box-shadow: 0 0 8px #22c55e88;
+        }
+
+        .status-dot.err {
+            background: var(--red);
+        }
+
+        .status-dot.loading {
+            background: #eab308;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            50% {
+                opacity: .25;
+            }
+        }
+
+        /* ---------------- Chips de zonas ---------------- */
+
+        .chips {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: thin;
+        }
+
+        .chips::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .chips::-webkit-scrollbar-thumb {
+            background: var(--surface-3);
+            border-radius: 3px;
+        }
+
+        .chip {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 7px 13px;
+            border-radius: 999px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            flex-shrink: 0;
+            transition: background .15s, color .15s, border-color .15s;
+        }
+
+        .chip:hover {
+            color: var(--text);
+            border-color: var(--accent);
+        }
+
+        .chip.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        .chip .count {
+            opacity: .65;
+            margin-left: 6px;
+            font-weight: 400;
+        }
+
+        /* ---------------- Zonas ---------------- */
+
+        .zone {
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 14px;
+            background: var(--surface);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #262626;
+        }
+
+        .zone-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 16px;
+            cursor: pointer;
+            user-select: none;
+            transition: background .15s;
+            border-bottom: 1px solid transparent;
+        }
+
+        .zone-head:hover {
+            background: var(--surface-2);
+        }
+
+        .zone.collapsed .zone-head {
+            border-bottom: none;
+        }
+
+        .zone-arrow {
+            color: var(--accent-soft);
+            font-size: 11px;
+            transform: rotate(90deg);
+            transition: transform .2s;
+            flex-shrink: 0;
+        }
+
+        .zone.collapsed .zone-arrow {
+            transform: rotate(0deg);
+        }
+
+        .zone-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--accent-soft);
+            text-align: left;
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .zone-count {
+            background: var(--surface-2);
+            color: var(--text-dim);
+            font-size: 11.5px;
+            padding: 3px 9px;
+            border-radius: 999px;
+            flex-shrink: 0;
+        }
+
+        .zone-body {
+            display: block;
+        }
+
+        .zone.collapsed .zone-body {
+            display: none;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--surface);
+        }
+
+        th,
+        td {
+            padding: 10px 16px;
+            text-align: left;
+            border-bottom: 1px solid #2b2b2b;
+        }
+
+        th {
+            background: var(--surface-3);
+            color: var(--text-dim);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            font-weight: 700;
+        }
+
+        tbody tr:hover {
+            background: var(--surface-2);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        td.name {
+            font-size: 14px;
+            word-break: break-word;
+        }
+
+        td.actions {
+            width: 190px;
+            white-space: nowrap;
+            text-align: right;
+        }
+
+        .row-actions {
+            display: inline-flex;
+            gap: 6px;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        button {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background .15s;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn-link {
+            background-color: var(--accent);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: background .15s;
+        }
+
+        .btn-link:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn-copy {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 7px 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-copy:hover {
+            background: var(--surface-3);
+            color: var(--text);
+        }
+
+        .btn-copy.copied {
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .5px;
+            padding: 2px 7px;
+            border-radius: 4px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .badge.ace {
+            background: #6200ea33;
+            color: var(--accent-soft);
+        }
+
+        .badge.web {
+            background: #ffffff12;
+            color: var(--text-dim);
+        }
+
+        /* ---------------- Estados ---------------- */
+
+        .hidden {
+            display: none !important;
+        }
+
+        .state {
+            width: 100%;
+            max-width: 900px;
+            padding: 40px 20px;
+            color: var(--text-dim);
+            font-size: 14px;
+        }
+
+        .state.error {
+            color: #ff8a8a;
+        }
+
+        .skeleton {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .skeleton-row {
+            height: 52px;
+            border-radius: 12px;
+            background: linear-gradient(90deg, #1e1e1e 25%, #262626 50%, #1e1e1e 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .empty {
+            width: 100%;
+            max-width: 900px;
+            padding: 30px 20px;
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 14px;
+        }
+
+        footer {
+            width: 100%;
+            max-width: 1400px;
+            color: #666;
+            font-size: 12px;
+            padding: 24px 20px 40px;
+        }
+
+        /* ---------------- Responsive ---------------- */
+
         @media (max-width: 900px) {
             .container {
                 flex-direction: column;
@@ -50,86 +529,34 @@
 
             .sidebar {
                 max-width: 100%;
-                text-align: center;
-            }
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: #1e1e1e;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        th,
-        td {
-            width: 85%;
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #333;
-        }
-
-        th {
-            background-color: #333;
-        }
-
-        tr:hover {
-            background-color: #292929;
-        }
-
-        button {
-            background-color: #6200ea;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        button:hover {
-            background-color: #3700b3;
-        }
-
-        .title {
-            color: #af76ff;
-            background-color: #6200ea18;
-            font-weight: bold;
-            font-size: 28px;
-        }
-
-        .separator {
-            /* background-color: red; */
-            color: #6c31be;
-            background-color: #292929;
-            font-weight: 100;
-            font-size: 18px;
-        }
-
-        .menu {
-            display: flex;
-            text-align: center;
-            justify-content: center;
-            flex-wrap: wrap;
-            width: 500px;
-            gap: 10px;
-
-            >a {
-                background-color: #6200ea;
-                color: white;
-                font-weight: bold;
-                padding: 10px;
-                border-radius: 10px;
+                position: static;
+                width: 100%;
             }
         }
 
         @media (max-width: 768px) {
-            table {
-                width: 95vw;
+            .content {
+                padding: 12px;
             }
-            .menu{
-                width: 95vw;
+
+            header h1 {
+                font-size: 22px;
             }
-            body{
+
+            th,
+            td {
+                padding: 9px 12px;
+            }
+
+            td.actions {
+                width: auto;
+            }
+
+            .zone-title {
+                font-size: 13.5px;
+            }
+
+            body {
                 font-size: 14px;
             }
         }
@@ -139,12 +566,13 @@
 <body>
     <header>
         <h1>ACE STREAM LINKS</h1>
+        <p class="subtitle">Canales en directo resueltos en tiempo real desde la red DNS de AceStream</p>
     </header>
 
     <div class="container">
         <!-- Barra lateral izquierda -->
         <aside class="sidebar">
-            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXX"
+            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7345993626465257"
                 data-ad-slot="YYYYYYYYYY" data-ad-format="auto" data-full-width-responsive="true"></ins>
             <script>
                 (adsbygoogle = window.adsbygoogle || []).push({});
@@ -153,238 +581,69 @@
 
         <!-- Contenido principal -->
         <main class="content">
-            <div class="menu">
-                <a href="#Movistar">Movistar</a>
-                <a href="#DAZN">DAZN</a>
-                <a href="#La Liga">La Liga</a>
-                <a href="#ESPN & EUROESPORT">ESPN & EUROESPORT</a>
-                <a href="#MGP TV">MGP TV</a>
-                <a href="#CANALES TV">CANALES TV</a>
+            <div class="toolbar">
+                <div class="toolbar-row">
+                    <div class="search-box">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="11" cy="11" r="7" />
+                            <line x1="16.5" y1="16.5" x2="21" y2="21" />
+                        </svg>
+                        <input type="text" id="search" placeholder="Buscar canal..." autocomplete="off"
+                            spellcheck="false">
+                    </div>
+                    <button class="btn btn-ghost" id="toggle-all" title="Expandir o contraer todas las categorias">
+                        Expandir todo
+                    </button>
+                    <button class="btn" id="refresh">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+                            <polyline points="21 3 21 9 15 9" />
+                        </svg>
+                        Actualizar
+                    </button>
+                </div>
+
+                <div class="toolbar-row">
+                    <div class="status">
+                        <span class="status-dot loading" id="status-dot"></span>
+                        <span id="status-text">Consultando DNS...</span>
+                    </div>
+                </div>
+
+                <div class="chips" id="chips"></div>
             </div>
 
-            <h3>FORMULA 1</h3>
-            <table id="f1">
-                <thead>
-                    <tr>
-                        <th>Canal</th>
-                        <th>Link</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <script>
-                        const f1 = [
-                            { "nombre": "DAZN FORMULA 1* --> NEW ERA III", "contentId": "fcb845950f6dab7ac3f85ea05762faf5caa6a811" },
-                            { "nombre": "DAZN F1 FHD (SAT) --> NEW ERA", "contentId": "4f1d222c600e66ef4990b3d7ea13bfa53f7bfea1" },
-                            { "nombre": "DAZN F1 FHD --> NEW ERA II", "contentId": "c367738691c63896679e523d4c1c7933729acc7b" },
-                            { "nombre": "DAZN F1 FHD --> NEW ERA", "contentId": "5d8613b5fde87f366bb5e41ac8011007a4c6bd3c" },
-                            { "nombre": "DAZN F1 1080 (Fórmula 1)", "contentId": "d6281d4e6310269b416180442a470d23a4a99dc9" },
-                            { "nombre": "DAZN F1 1080 (Fórmula 1)", "contentId": "2c6e4c897661e6b0257bfe931b66d20b2ec763b6" },
-                            { "nombre": "DAZN F1 1080 (Fórmula 1)", "contentId": "71eef80158aa8b37f3dc59f6793c6696df9a2dfa" },
-                            { "nombre": "DAZN F1 720 (Fórmula 1)", "contentId": "268289e7a3c5209960b53b4d43c8c65fab294b85" },
-                            { "nombre": "F1 TV 14 | Fernando Alonso | Aston Martin --> NEW ERA", "contentId": "adab1ca1447108f5dcee688d709bdd372a002c4b" },
-                            { "nombre": "F1 TV 55 | Carlos Sainz | Williams --> NEW ERA", "contentId": "ff6c8b62faf8b5130bea01fe2aa14e7bed8b3950" },
-                        ];
+            <div class="skeleton" id="skeleton">
+                <div class="skeleton-row"></div>
+                <div class="skeleton-row"></div>
+                <div class="skeleton-row"></div>
+                <div class="skeleton-row"></div>
+            </div>
 
-                        f1.forEach(stream => {
-                            document.write(`
-                        <tr>
-                            <td>${stream.nombre}</td>
-                            <td><a href="acestream://${stream.contentId}" target="_blank"><button>Ver</button></a></td>
-                        </tr>
-                    `);
-                        });
-                    </script>
-                </tbody>
-            </table>
+            <div class="state hidden" id="state"></div>
+            <div class="empty hidden" id="empty">No hay canales que coincidan con la busqueda.</div>
 
-            <h3>UFC</h3>
-            <table id="UFC">
-                <thead>
-                    <tr>
-                        <th>Canal</th>
-                        <th>Link</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <script>
-                        const ufc = [
-                            { "nombre": "UFC [ES]", "contentId": "916888d956caf960cc8456eb46a12775a858124c" },
-                            { "nombre": "UFC MAX", "contentId": "405f4975c759816fbc6606eeb990666f1853dfe2" },
-                            { "nombre": "UFC Fight Pass", "contentId": "f74dcf44f57fc71cb4b0719b3342e569eba50c51" },
-                            { "nombre": "UFC [EN]", "contentId": "2d4b53402ff6158ec5aa4b38a80a773b5e00da0d" },
-                            { "nombre": "GOL PLAY", "contentId": "3a2bbdbe4cc775c5c75ccb7d2408363d69c94b5d" },
-                            { "nombre": "GOL PLAY (IV)", "contentId": "5fe1d33db9ebe08cea0b27af064f068102b31831" },
-                        ];
-
-                        ufc.forEach(stream => {
-                            document.write(`
-                        <tr>
-                            <td>${stream.nombre}</td>
-                            <td><a href="acestream://${stream.contentId}" target="_blank"><button>Ver</button></a></td>
-                        </tr>
-                    `);
-                        });
-                    </script>
-                </tbody>
-            </table>
-
-            <h3>ALL</h3>
-            <table id="all">
-                <thead>
-                    <tr>
-                        <th>Canal</th>
-                        <th>Link</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <script>
-                        const all = [
-
-                            { "nombre": "**Movistar", "contentId": "" },
-                            { "nombre": "--La Liga", "contentId": "" },
-                            { "nombre": "M. LaLiga 1080 MultiAudio", "contentId": "d3de78aebe544611a2347f54d5796bd87f16c92d" },
-                            { "nombre": "M. LaLiga 1080 MultiAudio", "contentId": "94d34491106e00394835c8cb68aa94481339b53f" },
-                            { "nombre": "M. LaLiga 1080 MultiAudio", "contentId": "6d05b31e5e8fdae312fbd57897363a7b10ddb163" },
-                            { "nombre": "M. LaLiga 2 1080", "contentId": "83c6c4942d69f4aa324aa746c5d7dbfd7d1572b3" },
-                            { "nombre": "M. LaLiga 2 720", "contentId": "f31a586422c9244196c810c84b6c85da350318a5" },
-                            { "nombre": "M. LaLiga 3 1080", "contentId": "ebe14f1edeb49f2253e3b355a8beeadc9b4f0bc4" },
-                            { "nombre": "M. LaLiga 4 1080", "contentId": "68697ea4f261289d97bbc3418ad3cbc4180aa32f" },
-                            { "nombre": "--Liga de campeones", "contentId": "" },
-                            { "nombre": "M+ LIGA DE CAMPEONES FHD", "contentId": "ac73acd09d79c46cb818bfd945f20198d1718a85" },
-                            { "nombre": "M+ LIGA DE CAMPEONES FHD (SAT)", "contentId": "840f68a0dc6e27c2927a16b4d42b9401ac50270b" },
-                            { "nombre": "M+ LIGA DE CAMPEONES FHD", "contentId": "ec6ce96a4e4eb523108418a84babc9eca4b4c507" },
-                            { "nombre": "M+ LIGA DE CAMPEONES FHD", "contentId": "f43a021e8fd63334a4bf3fb11ffe58f89039a1d0" },
-                            { "nombre": "M+ LIGA DE CAMPEONES 2 FHD", "contentId": "deb8972491e3817ba2335662d7855d2c2c05a900" },
-                            { "nombre": "M+ LIGA DE CAMPEONES 2 FHD", "contentId": "bd6fa847d9eb4e6fa44b68da1304bf8684ef8acb" },
-                            { "nombre": "M+ LIGA DE CAMPEONES 3 FHD --> NEW ERA", "contentId": "8e65f92af1de567f0af83562c5a14a3db6dc8ac8" },
-                            { "nombre": "M+ LIGA DE CAMPEONES 4 FHD --> NEW ERA", "contentId": "5a8323792bb3d48f71d1f690d3f5ec4ad5b48301" },
-                            { "nombre": "M+ LIGA DE CAMPEONES 5 FHD --> NEW ERA", "contentId": "47ab133c0bd7c9e6eb6f11661d33101a9d3bfce3" },
-                            { "nombre": "--#VAMOS", "contentId": "" },
-                            { "nombre": "M #VAMOS", "contentId": "12ba546d229bc39f01c3c18988a034b215fe6adb" },
-                            { "nombre": "M #VAMOS", "contentId": "d03c13b6723f66155d7a0df3692a3b073fe630f2" },
-                            { "nombre": "M #VAMOS", "contentId": "68697ea4f261289d97bbc3418ad3cbc4180aa32f" },
-                            { "nombre": "M #VAMOS ELLAS", "contentId": "af636e7b1747cf868eedf242b96bd98f8fbbed4f" },
-                            { "nombre": "--DEPORTES", "contentId": "" },
-                            { "nombre": "M DEPORTES", "contentId": "55d4602cb22b0d8a33c10c2c2f42dae64a9e8895" },
-                            { "nombre": "M DEPORTES", "contentId": "3a74d9869b13e763476800740c6625e715a39879" },
-                            { "nombre": "M DEPORTES 2", "contentId": "d8c2ed470e847154a88f011137cc206319f6bed5" },
-                            { "nombre": "M. Bar FHD", "contentId": "580fa1e7623d514a94e8585f90c42eda09d5e4f1" },
-
-
-                            { "nombre": "**DAZN", "contentId": "" },
-                            { "nombre": "--La Liga", "contentId": "" },
-                            { "nombre": "DAZN LaLiga 1080 MultiAudio", "contentId": "110d441ddc9713a7452588770d2bc85504672f47" },
-                            { "nombre": "DAZN LaLiga 1080 MultiAudio", "contentId": "6de4794cd02f88f14354b5996823413a59a1de0f" },
-                            { "nombre": "DAZN LaLiga 1080 MultiAudio", "contentId": "ec29289b0b14756e686c03a501bae1efa05be70c" },
-                            { "nombre": "DAZN LaLiga 720", "contentId": "8c8c1e047a1c5ed213ba74722a5345dc55c3c0eb" },
-                            { "nombre": "DAZN LaLiga 2 1080 MultiAudio", "contentId": "51dbbfb42f8091e4ea7a2186b566a40e780953d9" },
-                            { "nombre": "DAZN LaLiga 2 720 MultiAudio", "contentId": "97ba38d47680954be40e48bd8f43e17222fefecb" },
-                            { "nombre": "--Canales", "contentId": "" },
-                            { "nombre": "DAZN 1 FHD", "contentId": "d5446f3cc8e42ba965fd9f1c73b1e2ac3921a6ab" },
-                            { "nombre": "DAZN 1 FHD", "contentId": "e6a00cb2912609dceeeee88d3f66a2de9718b421" },
-                            { "nombre": "DAZN 2 FHD", "contentId": "ca923c9873fd206a41c1e83ff8fc40e3cf323c9a" },
-                            { "nombre": "DAZN 2 FHD", "contentId": "a929eeec1268d69d1556a2e3ace793b2577d8810" },
-                            { "nombre": "DAZN 3 FHD --> NEW ERA", "contentId": "c34a6552886fad4627ea36947fdec3e46e4e3b08" },
-                            { "nombre": "DAZN 4 FHD --> NEW ERA", "contentId": "5e5b670d44e4f23a49ebe1770458066ac2cf58e3" },
-                            { "nombre": "--Bundesliga", "contentId": "" },
-                            { "nombre": "DAZN BUNDESLIGA 1 FHD --> NEW ERA", "contentId": "f2b903b4b286c2cfecc23ebea66a412ec887da45" },
-                            { "nombre": "DAZN BUNDESLIGA 2 FHD --> NEW ERA", "contentId": "e720d8fef514c63468bdae65d7c20d48e22d7df9" },
-                            { "nombre": "DAZN BUNDESLIGA 3 FHD --> NEW ERA", "contentId": "f2dc625a32ba3437100b1261fd0751d83d64ce91" },
-                            { "nombre": "--DAZN Bar", "contentId": "" },
-                            { "nombre": "DAZN 1 BAR FHD --> NEW ERA", "contentId": "ec10963a4408f96d2089a29af8b7a8ac4b23dd3c" },
-                            { "nombre": "DAZN 2 BAR FHD --> NEW ERA", "contentId": "f86e821848931eaa55bcb779e74f62d6a59f41c0" },
-                            { "nombre": "--DAZN Eventos", "contentId": "" },
-                            { "nombre": "DAZN EVENTOS 1 --> NEW ERA", "contentId": "9a81584b459dbcf71f765463cccd643c59894d74" },
-                            { "nombre": "DAZN EVENTOS 2 --> NEW ERA", "contentId": "7a90838e67f415e70fd7c9bb87edeb2da5db1725" },
-                            { "nombre": "DAZN EVENTOS 3 --> NEW ERA", "contentId": "e7330b2c28af22b081ab509df5aac9672a7e037b" },
-
-                            { "nombre": "**La Liga", "contentId": "" },
-                            { "nombre": "LaLiga HYPERMOTION FHD", "contentId": "4e066df67d118f95b41f850869abdc663c515186" },
-                            { "nombre": "LaLiga HYPERMOTION 1080", "contentId": "b2706a7ffbea236a3b398139a3a606ada664c0eb" },
-                            { "nombre": "LaLiga HYPERMOTION 720", "contentId": "121f719ebb94193c6086ef92865cf9b197750980" },
-                            { "nombre": "LaLiga HYPERMOTION 2 1080", "contentId": "0cfdfde1b70623b8c210b0f7301be2a87456481d" },
-                            { "nombre": "LaLiga HYPERMOTION 2 720", "contentId": "0a335406bad0b658aeddb2d38f8c0614b2e5623a" },
-                            { "nombre": "LaLiga HYPERMOTION 3", "contentId": "fefd45ed6ff415e05f1341b7d9da2988eacd13ea" },
-                            { "nombre": "LaLiga BAR 1080", "contentId": "94d34491106e00394835c8cb68aa94481339b53f" },
-                            { "nombre": "LaLiga BAR 1080", "contentId": "608b0faf7d3d25f6fe5dba13d5e4b4142949990e" },
-
-                            // ESPN & EUROESPORT
-                            { "nombre": "**ESPN & EUROESPORT", "contentId": "" },
-                            { "nombre": "EUROSPORT 1 FHD", "contentId": "16ffa1713f42aa27317ee039a2bd0cdbc89a1580" },
-                            { "nombre": "EUROSPORT 1 FHD", "contentId": "8e8cf5d0da2f30cd3b266344891a18ed6bacaf50" },
-                            { "nombre": "EUROSPORT 1 FHD", "contentId": "95120cee8223e9af839994ecc2b96aef05f8a151" },
-                            { "nombre": "EUROSPORT 2 FHD", "contentId": "0358f9db953e5fde91c34d7ed4bc368939b49853" },
-                            { "nombre": "EUROSPORT 2 HD", "contentId": "8e9390c1647da151a7bc0e1b37c4b4d21d83049d" },
-                            { "nombre": "EUROSPORT 2 (IV)", "contentId": "ca4860d9998d63029dcf08c6f5dfc2102c01be4e" },
-                            { "nombre": "ESPN HD [US]", "contentId": "4b4907de51ec11087d4bed5876f2a0c68264f442" },
-                            { "nombre": "ESPN2 HD [US]", "contentId": "664eb5fe460b96941aed633959a845b185cd8394" },
-                            { "nombre": "", "contentId": "" },
-
-                            // MOTOGP
-                            { "nombre": "**MGP TV", "contentId": "" },
-                            { "nombre": "MGPTV | Camara de a bordo 1", "contentId": "1cc1b4aeaae07bc257ed4951a774beb3d3b44c86" },
-                            { "nombre": "MGPTV | Camara de a bordo 2", "contentId": "44a1d2952357564004a1afa2e3e0d262a45c5742" },
-                            { "nombre": "MGPTV | Camara de a bordo 3", "contentId": "e55dfcc2111568668e2df397e5de440103c991fb" },
-                            { "nombre": "MGPTV | Camara de a bordo 4", "contentId": "8a0957fa263a3dbb986e75fdcf5fbf6ef111b742" },
-
-                            // CANALES TV
-                            { "nombre": "**CANALES TV", "contentId": "" },
-                            { "nombre": "LA 1 FHD", "contentId": "7225e4b281975f1a36d61dfd9724b669d7747b70" },
-                            { "nombre": "LA 2 FHD", "contentId": "56d98cef21d9e242a8c32f36259c850c467e9748" },
-                            { "nombre": "ANTENA 3 FHD", "contentId": "c5b1bb99bdee549885d4d680cafbdd0a026239f5" },
-                            { "nombre": "CUATRO FHD", "contentId": "da60cf19fab0b9e23aab83bb37d61e8b8c3b7655" },
-                            { "nombre": "TELECINCO FHD", "contentId": "154c6f876ddf1d9c87880eae0d0442335ec156bf" },
-                            { "nombre": "LA SEXTA FHD", "contentId": "a4378aa93f9f436cfd1654160991f554e5395d88" },
-                        ];
-
-                        // all.forEach(stream => {
-                        //     document.write(`
-                        //         <tr>
-                        //             <td>${stream.nombre}</td>
-                        //             <td>
-                        //                 ${stream.contentId !== "" ? `<a href="acestream://${stream.contentId}" target="_blank"><button>Ver</button></a>` : ''}
-                        //             </td>
-                        //         </tr>
-                        //     `);
-                        // });
-
-                        all.forEach(stream => {
-                            let nombreClass = '';
-                            let nombreSinSimbolos = stream.nombre;
-
-                            if (nombreSinSimbolos.startsWith('**')) {
-                                nombreClass = 'title';
-                                nombreSinSimbolos = nombreSinSimbolos.slice(2); // Elimina los '**'
-                            } else if (nombreSinSimbolos.startsWith('--')) {
-                                nombreClass = 'separator';
-                                nombreSinSimbolos = nombreSinSimbolos.slice(2); // Elimina los '--'
-                            }
-
-
-                            document.write(`
-                        <tr id="${nombreSinSimbolos}">
-                            <td class="${nombreClass}">${nombreSinSimbolos}</td>
-                            <td class="${nombreClass}">
-                                ${stream.contentId !== "" ? `<a href="acestream://${stream.contentId}" target="_blank"><button>Ver</button></a>` : ''}
-                            </td>
-                        </tr>
-                    `);
-                        });
-                    </script>
-                </tbody>
-            </table>
+            <div id="channels"></div>
         </main>
 
         <!-- Barra lateral derecha -->
         <aside class="sidebar">
-            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXX"
+            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7345993626465257"
                 data-ad-slot="ZZZZZZZZZZ" data-ad-format="auto" data-full-width-responsive="true"></ins>
             <script>
                 (adsbygoogle = window.adsbygoogle || []).push({});
             </script>
         </aside>
     </div>
-</body>
 
+    <footer>
+        Los enlaces se resuelven desde los registros DNS TXT de AceStream. Canal, enlace y disponibilidad pueden
+        cambiar en cualquier momento.
+    </footer>
+
+    <script src="/app.js"></script>
+</body>
 
 </html>
