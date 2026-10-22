@@ -34,6 +34,7 @@ dns-resolver.js        Respaldo: resuelve los canales desde el navegador (DoH).
 api/channels.js        Función serverless: GET /api/channels
 lib/dns-channels.js    Núcleo: resolución DNS TXT + recursión de categorías + caché.
 scripts/dev-server.js  Servidor local que replica el entorno de Vercel.
+public/icon.png        Icono de la app (sirve como favicon).
 package.json           Dependencias y scripts (npm run dev).
 README.md              Documentación breve de usuario.
 ads.txt                Publicador de AdSense: pub-7345993626465257
@@ -225,6 +226,17 @@ Al cambiar el formato de cualquiera, **sube el sufijo `_vN`**.
 **Relativas, nunca `/absolutas`**: así la web también funciona abriendo el
 `index.html` desde el disco (`file://`), donde el respaldo por DoH es el único
 que puede funcionar.
+
+### El favicon
+
+```html
+<link rel="icon" type="image/png" href="icon.png">
+```
+
+El archivo está en `public/icon.png`, pero **Vercel sirve el contenido de
+`public/` en la raíz del dominio**: en producción vale `/icon.png`, y
+`/public/icon.png` da 404. Por eso la referencia es `icon.png` (relativa) y no
+`public/icon.png`.
 
 ---
 
