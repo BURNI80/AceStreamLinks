@@ -16,10 +16,11 @@ El dominio raiz `682cb7103451b27a40bc9aa2.elcano.top` ya incluye el arbol comple
 ## Estructura
 
 ```
-api/channels.js      Funcion serverless (Vercel): GET /api/channels[?domain=...]
-lib/dns-channels.js  Resolucion DNS TXT + recursion de categorias + cache
-app.js               Frontend: pinta, filtra y cachea en el cliente
-index.html           Frontend (markup + estilos)
+api/channels.js       Funcion serverless (Vercel): GET /api/channels[?domain=...]
+lib/dns-channels.js   Resolucion DNS TXT + recursion de categorias + cache
+dns-resolver.js       Respaldo: el navegador resuelve lo mismo via DoH si la API falla
+app.js                Frontend: pinta, filtra y cachea en el cliente
+index.html            Frontend (markup + estilos)
 scripts/dev-server.js Servidor local que replica el entorno de Vercel
 ```
 
@@ -45,15 +46,30 @@ Respuesta:
 
 ## Resolucion DNS
 
-Se prueban tres transportes en orden y se usa el primero que responda:
+Se prueban tres transportes **en paralelo** y gana el primero que devuelve datos validos:
 
 1. **DNS crudo por TCP:53** contra los NS autoritativos de `elcano.top` (igual que el
    servidor de streaming). Requiere `dns-packet`.
-2. **Resolutor del sistema** (`dns.resolveTxt`).
-3. **DNS-over-HTTPS** (`cloudflare-dns.com` / `dns.google`).
+2. **DNS-over-HTTPS** (`cloudflare-dns.com` / `dns.google`).
+3. **Resolutor del sistema** (`dns.resolveTxt`).
+
+Los transportes que fallan se descartan solos, asi que si el puerto 53 esta bloqueado
+(firewall de un entorno serverless) no se pierde tiempo esperando timeouts. Una respuesta
+vacia o corrupta tambien se descarta en vez de tumbar la peticion.
 
 El resultado se cachea 5 minutos en memoria de la instancia y la respuesta lleva
 `Cache-Control: s-maxage=300` para la CDN de Vercel.
+
+## Respaldo en el navegador
+
+Si `/api/channels` no responde (funcion no desplegada, 404, error de red, timeout...), el
+frontend no se queda en blanco: `dns-resolver.js` resuelve el mismo arbol de canales
+desde el navegador usando DNS-over-HTTPS. El estado de la pagina indica la origen:
+
+```
+389 canales - actualizado 13:54:51 (navegador)
+```
+
 
 ## Desarrollo local
 

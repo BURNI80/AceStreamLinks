@@ -30,6 +30,13 @@ const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
 
   if (url.pathname === '/api/channels') {
+    // Simula una API caida (funcion no desplegada, error, timeout...) para
+    // probar el respaldo que resuelve los canales desde el navegador.
+    if (process.env.BROKEN_API) {
+      res.writeHead(404, { 'Content-Type': 'text/plain' }).end('Not found');
+      return;
+    }
+
     // Vercel expone res.status()/res.json() en sus funciones; aqui se iguala.
     res.status = (code) => {
       res.statusCode = code;

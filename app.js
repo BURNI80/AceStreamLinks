@@ -95,35 +95,62 @@ async function loadChannels(force) {
         setStatus('loading', 'Consultando DNS...');
     }
 
+    let data = null;
+    let error = null;
+
     try {
         const res = await fetch(API_URL + (force ? `?t=${Date.now()}` : ''), { cache: 'no-store' });
-        const data = await res.json();
-
-        if (!res.ok || !data.success) {
-            throw new Error(data.error || `HTTP ${res.status}`);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const json = await res.json();
+        if (!json.success) throw new Error(json.error || 'error del servidor');
+        data = json;
+        data.source = 'servidor';
+    } catch (err) {
+        error = err;
+        // La API no responde (funcion no desplegada, 404, sin red, timeout...).
+        // Se resuelve el mismo dato desde el navegador via DNS-over-HTTPS.
+        if (globalThis.AceDns) {
+            setStatus('loading', 'API no disponible, resolviendo desde el navegador...');
+            try {
+                const browserZones = await AceDns.fetchChannelData(AceDns.DEFAULT_DOMAIN);
+                data = {
+                    zones: browserZones,
+                    count: countLinks(browserZones),
+                    fetchedAt: Date.now(),
+                    source: 'navegador',
+                };
+                error = null;
+            } catch (err2) {
+                error = err2;
+            }
         }
+    }
 
+    if (data) {
         zones = data.zones || [];
         writeCache({ zones, count: data.count, fetchedAt: data.fetchedAt || Date.now() });
         render();
-        setStatus('ok', `${data.count} canales - actualizado ${formatTime(data.fetchedAt || Date.now())}`);
-    } catch (err) {
+        const source = data.source === 'navegador' ? ' (navegador)' : '';
+        setStatus('ok', `${data.count} canales - actualizado ${formatTime(data.fetchedAt || Date.now())}${source}`);
+    } else {
         if (zones.length) {
-            setStatus('err', `Sin conexion con el servidor (${err.message}) - mostrando cache`);
+            setStatus('err', `Sin conexion (${error.message}) - mostrando la ultima lista`);
         } else {
+            setStatus('err', 'Sin conexion con el servidor');
             skeletonEl.classList.add('hidden');
             stateEl.className = 'state error';
-            stateEl.innerHTML = `No se pudieron cargar los canales.<br><br>
+            stateEl.innerHTML = `No se pudieron cargar los canales.<br>
+                <small>${error ? error.message : ''}</small><br><br>
                 <button class="btn" id="retry">Reintentar</button>`;
             stateEl.classList.remove('hidden');
             const retry = $('#retry');
             if (retry) retry.onclick = () => loadChannels(true);
         }
-    } finally {
-        loading = false;
-        refreshBtn.disabled = false;
-        skeletonEl.classList.add('hidden');
     }
+
+    loading = false;
+    refreshBtn.disabled = false;
+    skeletonEl.classList.add('hidden');
 }
 
 /* ------------------------------------------------------------------ *
@@ -132,6 +159,10 @@ async function loadChannels(force) {
 
 function zoneLinks(zone) {
     return (zone.subLinks || []).filter((l) => l && l.url);
+}
+
+function countLinks(list) {
+    return list.reduce((acc, z) => acc + zoneLinks(z).length, 0);
 }
 
 function matches(name) {
@@ -209,6 +240,12 @@ function rowHtml(link) {
         ? '<span class="badge ace">ACE</span>'
         : '<span class="badge web">WEB</span>';
 
+    // El ID del canal se muestra siempre: es el hash que usa AceStream.
+    const id = ace ? contentId(link.url) : (link.url || '');
+    const idHtml = id
+        ? `<div class="ch-id" title="ID del canal">${escHtml(id)}</div>`
+        : '';
+
     const main = ace
         ? `<a class="btn-link" href="${escHtml(link.url)}" title="Abrir en AceStream">Ver</a>`
         : `<a class="btn-link" href="${escHtml(link.url)}" target="_blank" rel="noopener noreferrer" title="Abrir en el navegador">Abrir</a>`;
@@ -224,7 +261,7 @@ function rowHtml(link) {
 
     return `
         <tr>
-            <td class="name">${escHtml(link.name)}${badge}</td>
+            <td class="name">${escHtml(link.name)}${badge}${idHtml}</td>
             <td class="actions">
                 <span class="row-actions">${main}${copy}</span>
             </td>
