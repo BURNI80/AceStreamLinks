@@ -12,7 +12,6 @@ const CACHE_TTL = 5 * 60 * 1000;
 const $ = (sel) => document.querySelector(sel);
 
 const searchInput = $('#search');
-const chipsEl = $('#chips');
 const channelsEl = $('#channels');
 const skeletonEl = $('#skeleton');
 const stateEl = $('#state');
@@ -23,7 +22,6 @@ const statusDot = $('#status-dot');
 const statusText = $('#status-text');
 
 let zones = [];
-let activeZone = null;
 let query = '';
 let loading = false;
 
@@ -171,26 +169,22 @@ function matches(name) {
 }
 
 function render() {
-    const total = zones.reduce((acc, z) => acc + zoneLinks(z).length, 0);
-    renderChips(total);
-
     let visibleZones = 0;
     let visibleLinks = 0;
 
     channelsEl.innerHTML = '';
 
     for (const zone of zones) {
-        if (activeZone !== null && zone.name !== activeZone) continue;
-
         const links = zoneLinks(zone).filter((l) => matches(l.name));
         if (query && links.length === 0) continue;
 
         visibleZones++;
         visibleLinks += links.length;
 
-        const collapsed = query ? false : isCollapsed(zone.name);
+        // Con busqueda las categorias se abren para poder ver las coincidencias.
+        const expanded = query ? true : isExpanded(zone.name);
         const section = document.createElement('section');
-        section.className = 'zone' + (collapsed ? ' collapsed' : '');
+        section.className = 'zone' + (expanded ? '' : ' collapsed');
         section.dataset.zone = zone.name;
 
         const head = document.createElement('div');
@@ -201,8 +195,10 @@ function render() {
             <span class="zone-count">${links.length}</span>
         `;
         head.onclick = () => {
-            const nowCollapsed = section.classList.toggle('collapsed');
-            toggleZoneState(zone.name, nowCollapsed);
+            const willExpand = section.classList.contains('collapsed');
+            section.classList.toggle('collapsed', !willExpand);
+            setExpanded(zone.name, willExpand);
+            updateToggleLabel();
         };
 
         const body = document.createElement('div');
@@ -227,9 +223,7 @@ function render() {
 
     stateEl.classList.add('hidden');
     emptyEl.classList.toggle('hidden', !(visibleLinks === 0 && zones.length > 0));
-
-    const allCollapsed = zones.length > 0 && zones.every((z) => isCollapsed(z.name));
-    toggleAllBtn.textContent = allCollapsed ? 'Expandir todo' : 'Contraer todo';
+    updateToggleLabel();
 
     bindRowActions();
 }
@@ -269,38 +263,6 @@ function rowHtml(link) {
     `;
 }
 
-function renderChips(total) {
-    const counts = new Map();
-    let matched = 0;
-    for (const zone of zones) {
-        const n = zoneLinks(zone).filter((l) => matches(l.name)).length;
-        counts.set(zone.name, n);
-        matched += n;
-    }
-
-    const chips = [];
-    chips.push(`<button class="chip${activeZone === null ? ' active' : ''}" data-zone="">
-        Todos<span class="count">${query ? matched : total}</span></button>`);
-
-    for (const zone of zones) {
-        const n = counts.get(zone.name);
-        if (query && n === 0) continue;
-        const active = activeZone === zone.name;
-        chips.push(`<button class="chip${active ? ' active' : ''}" data-zone="${escHtml(zone.name)}">
-            ${escHtml(zone.name)}<span class="count">${n}</span></button>`);
-    }
-
-    chipsEl.innerHTML = chips.join('');
-
-    for (const chip of chipsEl.querySelectorAll('.chip')) {
-        chip.onclick = () => {
-            const zone = chip.dataset.zone;
-            activeZone = zone ? zone : null;
-            render();
-        };
-    }
-}
-
 function bindRowActions() {
     for (const btn of channelsEl.querySelectorAll('.btn-copy')) {
         btn.onclick = async (ev) => {
@@ -324,29 +286,47 @@ function bindRowActions() {
 
 /* ------------------------------------------------------------------ *
  * Estado de plegado (persistido)
+ *
+ * Se guarda la lista de categorias ABIERTAS. Por defecto todas estan
+ * condensadas: solo se despliega la que el usuario abre.
  * ------------------------------------------------------------------ */
 
-const COLLAPSE_KEY = 'acestream_collapsed_zones_v1';
-let collapsedZones = new Set();
+const EXPANDED_KEY = 'acestream_expanded_zones_v2';
+let expandedZones = new Set();
 
 try {
-    collapsedZones = new Set(JSON.parse(localStorage.getItem(COLLAPSE_KEY) || '[]'));
+    const stored = JSON.parse(localStorage.getItem(EXPANDED_KEY) || '[]');
+    expandedZones = new Set(Array.isArray(stored) ? stored : []);
 } catch (_) {
-    collapsedZones = new Set();
+    expandedZones = new Set();
 }
 
-function isCollapsed(name) {
-    return collapsedZones.has(name);
+function isExpanded(name) {
+    return expandedZones.has(name);
 }
 
-function toggleZoneState(name, collapsed) {
-    if (collapsed) collapsedZones.add(name);
-    else collapsedZones.delete(name);
+function setExpanded(name, expanded) {
+    if (expanded) expandedZones.add(name);
+    else expandedZones.delete(name);
     try {
-        localStorage.setItem(COLLAPSE_KEY, JSON.stringify([...collapsedZones]));
+        localStorage.setItem(EXPANDED_KEY, JSON.stringify([...expandedZones]));
     } catch (_) {
         /* ignore */
     }
+}
+
+function saveExpanded() {
+    try {
+        localStorage.setItem(EXPANDED_KEY, JSON.stringify([...expandedZones]));
+    } catch (_) {
+        /* ignore */
+    }
+}
+
+// El boton dice siempre la proxima accion: si todo esta contraido, "Expandir todo".
+function updateToggleLabel() {
+    const anyExpanded = zones.some((z) => isExpanded(z.name));
+    toggleAllBtn.textContent = anyExpanded ? 'Contraer todo' : 'Expandir todo';
 }
 
 /* ------------------------------------------------------------------ *
@@ -365,17 +345,12 @@ searchInput.addEventListener('input', (e) => {
 refreshBtn.addEventListener('click', () => loadChannels(true));
 
 toggleAllBtn.addEventListener('click', () => {
-    const allExpanded = zones.length > 0 && zones.every((z) => !isCollapsed(z.name));
-    collapsedZones = new Set();
-    if (allExpanded) {
-        for (const z of zones) collapsedZones.add(z.name);
+    const anyExpanded = zones.some((z) => isExpanded(z.name));
+    expandedZones = new Set();
+    if (!anyExpanded) {
+        for (const z of zones) expandedZones.add(z.name);
     }
-    try {
-        localStorage.setItem(COLLAPSE_KEY, JSON.stringify([...collapsedZones]));
-    } catch (_) {
-        /* ignore */
-    }
-    toggleAllBtn.textContent = allExpanded ? 'Expandir todo' : 'Contraer todo';
+    saveExpanded();
     render();
 });
 

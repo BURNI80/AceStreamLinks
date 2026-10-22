@@ -215,56 +215,6 @@
             }
         }
 
-        /* ---------------- Chips de zonas ---------------- */
-
-        .chips {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding-bottom: 4px;
-            scrollbar-width: thin;
-        }
-
-        .chips::-webkit-scrollbar {
-            height: 6px;
-        }
-
-        .chips::-webkit-scrollbar-thumb {
-            background: var(--surface-3);
-            border-radius: 3px;
-        }
-
-        .chip {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            color: var(--text-dim);
-            padding: 7px 13px;
-            border-radius: 999px;
-            font-size: 12.5px;
-            font-weight: 600;
-            cursor: pointer;
-            white-space: nowrap;
-            flex-shrink: 0;
-            transition: background .15s, color .15s, border-color .15s;
-        }
-
-        .chip:hover {
-            color: var(--text);
-            border-color: var(--accent);
-        }
-
-        .chip.active {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: #fff;
-        }
-
-        .chip .count {
-            opacity: .65;
-            margin-left: 6px;
-            font-weight: 400;
-        }
-
         /* ---------------- Zonas ---------------- */
 
         .zone {
@@ -623,8 +573,6 @@
                         <span id="status-text">Consultando DNS...</span>
                     </div>
                 </div>
-
-                <div class="chips" id="chips"></div>
             </div>
 
             <div class="skeleton" id="skeleton">
