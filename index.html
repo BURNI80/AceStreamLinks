@@ -494,6 +494,11 @@
                 max-width: 100%;
                 position: static;
                 width: 100%;
+                padding: 12px 20px 0;
+            }
+
+            .sidebar .adsbygoogle {
+                max-width: 100%;
             }
         }
 
@@ -502,8 +507,37 @@
                 padding: 12px;
             }
 
+            header {
+                padding: 20px 12px 6px;
+            }
+
             header h1 {
                 font-size: 22px;
+            }
+
+            header .subtitle {
+                font-size: 12px;
+            }
+
+            .toolbar {
+                gap: 10px;
+                margin-bottom: 14px;
+            }
+
+            .toolbar-row {
+                gap: 8px;
+            }
+
+            .search-box {
+                min-width: 100%;
+                flex-basis: 100%;
+            }
+
+            .btn,
+            .btn-ghost {
+                flex: 1;
+                justify-content: center;
+                padding: 11px 12px;
             }
 
             th,
@@ -515,12 +549,91 @@
                 width: auto;
             }
 
+            .zone {
+                border-radius: 10px;
+            }
+
+            .zone-head {
+                padding: 11px 12px;
+                gap: 8px;
+            }
+
             .zone-title {
                 font-size: 13.5px;
             }
 
+            .zone-count {
+                font-size: 11px;
+                padding: 2px 8px;
+            }
+
             body {
                 font-size: 14px;
+            }
+
+            footer {
+                padding: 18px 12px 30px;
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            /* En movil convertimos cada fila de la tabla en una tarjeta
+               vertical para que no se corte ni desborde horizontalmente. */
+            table,
+            thead,
+            tbody,
+            tr,
+            td {
+                display: block;
+                width: 100%;
+            }
+
+            thead {
+                display: none;
+            }
+
+            tbody tr {
+                margin: 0 0 8px;
+                border: 1px solid #2b2b2b;
+                border-radius: 10px;
+                background: var(--surface-2);
+                overflow: hidden;
+            }
+
+            tbody tr:last-child {
+                margin-bottom: 0;
+            }
+
+            td {
+                padding: 8px 12px;
+                border-bottom: none;
+            }
+
+            td.name {
+                font-size: 14px;
+                padding-bottom: 4px;
+            }
+
+            td.actions {
+                text-align: left;
+                padding-top: 4px;
+                border-top: 1px solid #2b2b2b;
+            }
+
+            .row-actions {
+                justify-content: flex-start;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .btn-link,
+            .btn-copy {
+                flex: 1 1 auto;
+            }
+
+            .ch-id {
+                font-size: 10.5px;
             }
         }
     </style>
