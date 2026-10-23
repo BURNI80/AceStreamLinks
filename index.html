@@ -28,6 +28,10 @@
             box-sizing: border-box;
         }
 
+        html {
+            -webkit-text-size-adjust: 100%;
+        }
+
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -55,6 +59,12 @@
             box-sizing: border-box;
             position: sticky;
             top: 20px;
+        }
+
+        /* Un hueco de anuncio sin rellenar dejaba cientos de pixeles vacios
+           (sobre todo en movil). Se oculta cuando AdSense lo marca asi. */
+        .sidebar .adsbygoogle[data-ad-status="unfilled"] {
+            display: none !important;
         }
 
         .content {
@@ -217,6 +227,16 @@
         }
 
         /* ---------------- Zonas ---------------- */
+
+        /* El listado completo ocupa el ancho disponible. Sin esto, al ser un
+           flex item con ancho automatico tomaba el ancho max-content de la
+           tabla y desbordaba la pantalla en movil. */
+        #channels {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
         .zone {
             width: 100%;
@@ -487,7 +507,17 @@
         @media (max-width: 900px) {
             .container {
                 flex-direction: column;
-                align-items: center;
+                /* stretch (no center): con auto el ancho lo fijaba el contenido
+                   mas ancho (la tabla) y la pagina se desbordaba a los lados. */
+                align-items: stretch;
+            }
+
+            .content {
+                width: 100%;
+                max-width: 100%;
+                padding: 16px 20px 20px;
+                /* En movil el listado va primero; los anuncios quedan debajo. */
+                order: 1;
             }
 
             .sidebar {
@@ -495,6 +525,7 @@
                 position: static;
                 width: 100%;
                 padding: 12px 20px 0;
+                order: 2;
             }
 
             .sidebar .adsbygoogle {
@@ -531,6 +562,11 @@
             .search-box {
                 min-width: 100%;
                 flex-basis: 100%;
+            }
+
+            .search-box input {
+                /* 16px evita el zoom automatico de iOS al enfocar el buscador. */
+                font-size: 16px;
             }
 
             .btn,
